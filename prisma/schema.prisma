@@ -7,6 +7,67 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model User {
+  id            String        @id @default(cuid())
+  name          String?
+  email         String?       @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  createdFlows  Flow[]        @relation("UserFlows")
+  userOnFlows   UserOnFlow[]
+  usersOnSteps  UsersOnStep[]
+}
+
+model Flow {
+  flowId      String   @id @default(cuid())
+  name        String
+  createdAt   DateTime @default(now())
+  creatorId   String // Links a Flow to its creator.
+  creator     User     @relation(fields: [creatorId], references: [id], name: "UserFlows")
+  title       String
+  description String
+
+  users UserOnFlow[] @relation("FlowsUsers")
+  steps StepOnFlow[]
+}
+
+model UserOnFlow {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  flow      Flow     @relation(fields: [id], references: [flowId], name: "FlowsUsers")
+
+  @@unique([userId, id])
+}
+
+model StepOnFlow {
+  id          String   @id @default(cuid())
+  name        String
+  rank        Int // Determines the order of Steps in a Flow.
+  description String
+  createdAt   DateTime @default(now())
+
+  flow  Flow          @relation(fields: [id], references: [flowId])
+  users UsersOnStep[]
+
+  @@index([id]) // Optimizes queries that filter by Flow.
+}
+
+model UsersOnStep {
+  id           String   @id @default(cuid())
+  userId       String
+  stepOnFlowId String
+  createdAt    DateTime @default(now())
+
+  user User       @relation(fields: [userId], references: [id])
+  step StepOnFlow @relation(fields: [stepOnFlowId], references: [id])
+
+  @@unique([userId, stepOnFlowId])
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -32,16 +93,6 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
 }
 
 model VerificationToken {

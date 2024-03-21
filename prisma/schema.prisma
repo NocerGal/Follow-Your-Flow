@@ -8,7 +8,7 @@ generator client {
 }
 
 model User {
-  id            String        @id @default(cuid())
+  id            String        @id @default(uuid())
   name          String?
   email         String?       @unique
   emailVerified DateTime?
@@ -21,55 +21,55 @@ model User {
 }
 
 model Flow {
-  flowId      String   @id @default(cuid())
-  name        String
-  createdAt   DateTime @default(now())
-  creatorId   String // Links a Flow to its creator.
-  creator     User     @relation(fields: [creatorId], references: [id], name: "UserFlows")
+  id          String       @id @default(uuid())
+  createdAt   DateTime     @default(now())
+  creatorId   String
+  creator     User         @relation(fields: [creatorId], references: [id], name: "UserFlows")
   title       String
   description String
-
-  users UserOnFlow[] @relation("FlowsUsers")
-  steps StepOnFlow[]
+  users       UserOnFlow[] @relation("FlowsUsers")
+  steps       StepOnFlow[]
 }
 
 model UserOnFlow {
-  id        String   @id @default(cuid())
-  userId    String
+  id     String @id @default(uuid())
+  userId String
+  flowId String
+
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
-  flow      Flow     @relation(fields: [id], references: [flowId], name: "FlowsUsers")
+  flow      Flow     @relation(fields: [flowId], references: [id], name: "FlowsUsers")
 
-  @@unique([userId, id])
+  @@unique([userId, flowId])
 }
 
 model StepOnFlow {
-  id          String   @id @default(cuid())
+  id          String        @id @default(uuid())
   name        String
-  rank        Int // Determines the order of Steps in a Flow.
+  rank        Int
   description String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime      @default(now())
+  flowId      String
+  flow        Flow          @relation(fields: [flowId], references: [id])
+  users       UsersOnStep[]
 
-  flow  Flow          @relation(fields: [id], references: [flowId])
-  users UsersOnStep[]
-
-  @@index([id]) // Optimizes queries that filter by Flow.
+  @@index([id])
 }
 
 model UsersOnStep {
-  id           String   @id @default(cuid())
+  id           String @id @default(uuid())
   userId       String
   stepOnFlowId String
-  createdAt    DateTime @default(now())
 
-  user User       @relation(fields: [userId], references: [id])
-  step StepOnFlow @relation(fields: [stepOnFlowId], references: [id])
+  createdAt DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id])
+  step      StepOnFlow @relation(fields: [stepOnFlowId], references: [id])
 
   @@unique([userId, stepOnFlowId])
 }
 
 model Account {
-  id                String  @id @default(cuid())
+  id                String  @id @default(uuid())
   userId            String
   type              String
   provider          String
@@ -88,7 +88,7 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime

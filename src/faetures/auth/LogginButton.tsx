@@ -7,6 +7,7 @@ import { signIn } from 'next-auth/react';
 import React from 'react';
 
 export default function LogginButton() {
+  // mutation to connect to website
   const mutation = useMutation({ mutationFn: async () => signIn() });
 
   return (

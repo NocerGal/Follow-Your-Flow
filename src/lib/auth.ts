@@ -15,6 +15,7 @@ export const getAuthSession = async (
   ...parameters: ParametersGetServerSession
 ) => {
   const session = await getServerSession(...parameters, authOptions);
+  // return when getAuthSession is executed
   return session;
 };
 
@@ -27,6 +28,7 @@ export const getRequiredAuthSession = async (
     throw new Error('Unauthorized');
   }
 
+  // return when getRequiredAuthSession is executed
   return session as {
     user: {
       id: string;

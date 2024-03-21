@@ -35,6 +35,7 @@ type LoggedInButtonPropsTypes = {
 };
 
 export default function LoggedInButton({ user }: LoggedInButtonPropsTypes) {
+  // Mutation used to signout
   const mutation = useMutation({ mutationFn: async () => signOut() });
 
   return (
@@ -63,7 +64,7 @@ export default function LoggedInButton({ user }: LoggedInButtonPropsTypes) {
           <DropdownMenuItem>Admins</DropdownMenuItem>
           <DropdownMenuItem>My Flows</DropdownMenuItem>
           <DropdownMenuSeparator />
-
+          {/* Will be displayed AlertDialogContent when triggered */}
           <AlertDialogTrigger asChild>
             <DropdownMenuItem>
               <ExitIcon className="mr-2" />
@@ -71,6 +72,7 @@ export default function LoggedInButton({ user }: LoggedInButtonPropsTypes) {
             </DropdownMenuItem>
           </AlertDialogTrigger>
         </DropdownMenuContent>
+        {/* Modal proposing to disconnect or cancel */}
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -81,6 +83,7 @@ export default function LoggedInButton({ user }: LoggedInButtonPropsTypes) {
             <AlertDialogCancel asChild>
               <Button variant="secondary">Cancel</Button>
             </AlertDialogCancel>
+            {/* Button to disconnect and be redirected to homepage */}
             <Button variant="destructive" onClick={() => mutation.mutate()}>
               {mutation.isPending ? (
                 <UpdateIcon className="animate-spin" />

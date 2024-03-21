@@ -5,9 +5,10 @@ import LoggedInButton from './LoggedInButton';
 export default async function AuthButton() {
   const session = await getAuthSession();
 
-  console.log(session);
+  // if user is not connected, Loggin is displayed
   if (!session?.user) {
     return <LogginButton />;
   }
+  // Displaye LoggedInButton if user is already connected
   return <LoggedInButton user={session.user} />;
 }

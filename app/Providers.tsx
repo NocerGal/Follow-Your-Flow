@@ -8,7 +8,9 @@ import { TailwindIndicator } from '@/src/TailwindIndicator';
 export default function Providers({ children }: PropsWithChildren) {
   const queryClient = new QueryClient();
   return (
+    // Theme provider to change theme
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      {/* SessionProvider for using nextAuth session */}
       <SessionProvider>
         <TailwindIndicator />
         <QueryClientProvider client={queryClient}>

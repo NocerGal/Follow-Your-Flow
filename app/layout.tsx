@@ -24,8 +24,8 @@ export default function RootLayout({
         <Providers>
           <div className="relative flex min-h-screen flex-col">
             <Header />
-            <div className="flex h-full flex-1 justify-center">
-              <div className="flex w-full">{children}</div>
+            <div className="flex flex-1 max-w-lg w-full mx-auto">
+              {children}
             </div>
             <Footer />
           </div>

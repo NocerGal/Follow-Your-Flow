@@ -1,9 +1,10 @@
 import React from 'react';
+import FormCreateFlow from './FormCreateFlow';
 
 export default function NewFlowPage() {
   return (
-    <div>
-      <p>Un nouveau flow</p>
+    <div className="flex justify-center w-full mt-10">
+      <FormCreateFlow />
     </div>
   );
 }

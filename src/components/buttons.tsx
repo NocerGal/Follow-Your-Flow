@@ -1,9 +1,19 @@
 'use client';
 
 import { signIn, useSession } from 'next-auth/react';
+import { ButtonHTMLAttributes } from 'react';
 
-// Button clientSide to connect to the user's account
+type ButtonProps = {
+  children: string;
+} & ButtonHTMLAttributes<HTMLButtonElement>;
 
-export default function Button() {
-  return <button onClick={() => signIn()}>Connect</button>;
+export default function Button({ children, ...props }: ButtonProps) {
+  return (
+    <button
+      {...props}
+      onClick={() => signIn('github', { callbackUrl: '/flow/new' })}
+    >
+      {children}
+    </button>
+  );
 }

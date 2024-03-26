@@ -36,7 +36,9 @@ type LoggedInButtonPropsTypes = {
 
 export default function LoggedInButton({ user }: LoggedInButtonPropsTypes) {
   // Mutation used to signout
-  const mutation = useMutation({ mutationFn: async () => signOut() });
+  const mutation = useMutation({
+    mutationFn: async () => signOut({ callbackUrl: '/' }),
+  });
 
   return (
     <DropdownMenu>

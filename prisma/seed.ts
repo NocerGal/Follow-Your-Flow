@@ -47,13 +47,6 @@ async function main() {
         },
       });
     }
-
-    // await prisma.usersOnStep.create({
-    //   data: {
-    //     userId: user.id,
-    //     stepOnFlowId: step.id,
-    //   },
-    // });
   }
 }
 

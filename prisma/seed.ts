@@ -1,53 +1,55 @@
-// import { prisma } from '@/src/lib/prisma';
+const { PrismaClient } = require('@prisma/client');
 import { faker } from '@faker-js/faker';
-import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Générer des données pour 10 utilisateurs
+  // Génération et insertion des utilisateurs
   for (let i = 0; i < 10; i++) {
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
-        name: faker.person.firstName(),
+        name: faker.name.firstName(),
         email: faker.internet.email(),
         image: faker.image.avatar(),
       },
     });
+  }
 
+  // Génération et insertion des flows
+  const users = await prisma.user.findMany();
+  for (const user of users) {
     const flow = await prisma.flow.create({
       data: {
-        title: faker.lorem.word(),
+        title: faker.lorem.words(),
         description: faker.lorem.sentence(),
-        creatorId: user.id, // Utilisez id directement
+        creator: {
+          connect: { id: user.id },
+        },
       },
     });
 
+    // Génération et insertion de UserOnFlow
     await prisma.userOnFlow.create({
       data: {
-        flowId: flow.id,
         userId: user.id,
+        flowId: flow.id,
+        status: 'USER',
       },
     });
 
-    for (let j = 0; j < 5; j++) {
-      const step = await prisma.stepOnFlow.create({
-        data: {
-          name: faker.lorem.words(),
-          rank: j,
-          description: faker.lorem.sentence(),
-          flowId: flow.id,
-        },
-      });
-
-      await prisma.usersOnStep.create({
-        data: {
-          userId: user.id,
-          stepOnFlowId: step.id,
-        },
-      });
-    }
+    // Génération et insertion de StepOnFlow
+    await prisma.stepOnFlow.create({
+      data: {
+        title: faker.lorem.words(),
+        rank: faker.datatype.string(1),
+        description: faker.lorem.sentence(),
+        flowId: flow.id,
+        creatorId: user.id,
+      },
+    });
   }
+
+  console.log('Seed terminé avec succès !');
 }
 
 main()

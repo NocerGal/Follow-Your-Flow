@@ -8,64 +8,65 @@ generator client {
 }
 
 model User {
-  id            String        @id @default(uuid())
-  name          String?       @unique
-  email         String?       @unique
+  id            String       @id @default(uuid())
+  flows         Flow[]       @relation("FlowCreator")
+  userOnFlows   UserOnFlow[] // Relations entre les utilisateurs et les flows
+  userOnSteps   UserOnStep[]
+  name          String?      @unique
+  email         String?      @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  createdFlows  Flow[]        @relation("UserFlows")
-  userOnFlows   UserOnFlow[]
-  usersOnSteps  UsersOnStep[]
+  StepOnFlow    StepOnFlow[]
 }
 
 model Flow {
   id          String       @id @default(uuid())
   createdAt   DateTime     @default(now())
   creatorId   String
-  creator     User         @relation(fields: [creatorId], references: [id], name: "UserFlows")
+  creator     User         @relation(name: "FlowCreator", fields: [creatorId], references: [id])
   title       String
   description String
-  users       UserOnFlow[] @relation("FlowsUsers")
-  steps       StepOnFlow[]
+  usersOnFlow UserOnFlow[]
+  stepsOnFlow StepOnFlow[]
 }
 
 model UserOnFlow {
-  id     String @id @default(uuid())
-  userId String
-  flowId String
-
+  id        String   @default(uuid())
   createdAt DateTime @default(now())
+  userId    String
   user      User     @relation(fields: [userId], references: [id])
-  flow      Flow     @relation(fields: [flowId], references: [id], name: "FlowsUsers")
+  flowId    String
+  flow      Flow     @relation(fields: [flowId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, flowId])
+  status String @default("USER")
+
+  @@id([userId, flowId])
 }
 
 model StepOnFlow {
-  id          String        @id @default(uuid())
-  name        String
-  rank        Int
+  id          String   @id @default(uuid())
+  title       String
+  rank        String
   description String
-  createdAt   DateTime      @default(now())
+  createdAt   DateTime @default(now())
   flowId      String
-  flow        Flow          @relation(fields: [flowId], references: [id])
-  users       UsersOnStep[]
+  flow        Flow     @relation(fields: [flowId], references: [id], onDelete: Cascade)
+  creatorId   String
+  creator     User     @relation(fields: [creatorId], references: [id]) // Relation vers User
 
-  @@index([id])
+  managers UserOnStep[] // Les managers de cette étape
 }
 
-model UsersOnStep {
-  id           String @id @default(uuid())
-  userId       String
-  stepOnFlowId String
+model UserOnStep {
+  userId String
+  user   User       @relation(fields: [userId], references: [id])
+  stepId String
+  step   StepOnFlow @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  status String     @default("USER")
 
-  createdAt DateTime   @default(now())
-  user      User       @relation(fields: [userId], references: [id])
-  step      StepOnFlow @relation(fields: [stepOnFlowId], references: [id])
-
-  @@unique([userId, stepOnFlowId])
+  @@id([userId, stepId])
 }
 
 model Account {

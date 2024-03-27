@@ -1,7 +1,8 @@
 'use server';
 import { getRequiredAuthSession } from '@/src/lib/auth';
+import { NewManager, NewPartner } from './FormCreateFlow';
 import { prisma } from '@/src/lib/prisma';
-import { NewPartner } from './FormCreateFlow';
+import { Prisma } from '@prisma/client';
 
 type ActionCreateFlowTypes = {
   title: string;
@@ -24,17 +25,58 @@ export const actionCreateFlow = async ({
       creator: {
         connect: { id: creatorId },
       },
-      users: {
-        create: userIds.map((userId) => ({
+      usersOnFlow: {
+        create: userIds.map((user) => ({
           user: {
-            connect: { id: userId.id },
+            connect: {
+              id: user.id,
+            },
           },
         })),
       },
     },
-    include: {
-      users: true,
-    },
   });
+
   return createFlow;
 };
+
+type ActionCreateStepTypes = {
+  title: string;
+  description: string;
+  userIds: NewManager[];
+  status: string;
+  flowId: string;
+};
+
+export const actionCreateStep = async ({
+  title,
+  description,
+  userIds,
+  status,
+  flowId,
+}: ActionCreateStepTypes) => {
+  const session = await getRequiredAuthSession();
+
+  const createStep = await prisma.stepOnFlow.create({
+    data: {
+      title,
+      creatorId: session.user.id,
+      rank: 'aaaaa',
+      description,
+      flowId,
+      managers: {
+        create: userIds.map((userId) => ({
+          status: 'MANAGER',
+          user: {
+            connect: {
+              id: userId.id,
+            },
+          },
+        })),
+      },
+    },
+  });
+  return createStep;
+};
+
+export type NewStepType = Prisma.PromiseReturnType<typeof actionCreateStep>;

@@ -3,6 +3,7 @@ import { getRequiredAuthSession } from '@/src/lib/auth';
 import { NewManager, NewPartner } from './FormCreateFlow';
 import { prisma } from '@/src/lib/prisma';
 import { Prisma } from '@prisma/client';
+import { queryManagerOnStep } from './user.query';
 
 type ActionCreateFlowTypes = {
   title: string;
@@ -52,7 +53,6 @@ export const actionCreateStep = async ({
   title,
   description,
   userIds,
-  status,
   flowId,
 }: ActionCreateStepTypes) => {
   const session = await getRequiredAuthSession();
@@ -76,7 +76,11 @@ export const actionCreateStep = async ({
       },
     },
   });
-  return createStep;
+
+  const managers = await queryManagerOnStep(createStep.id);
+  const stepWithManagers = { createStep, managers };
+
+  return stepWithManagers;
 };
 
 export type NewStepType = Prisma.PromiseReturnType<typeof actionCreateStep>;

@@ -84,3 +84,5 @@ export const actionCreateStep = async ({
 };
 
 export type NewStepType = Prisma.PromiseReturnType<typeof actionCreateStep>;
+
+export type ManagersType = NewStepType['managers'];

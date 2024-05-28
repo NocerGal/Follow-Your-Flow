@@ -44,7 +44,16 @@ export const actionCreateFlow = async ({
 type ActionCreateStepTypes = {
   title: string;
   description: string;
-  userIds: NewManager[];
+  managers: {
+    user: {
+      id: string;
+      name: string | null;
+      email: string | null;
+      emailVerified: Date | null;
+      image: string | null;
+    };
+    userId: string;
+  }[];
   status: string;
   flowId: string;
 };
@@ -52,7 +61,7 @@ type ActionCreateStepTypes = {
 export const actionCreateStep = async ({
   title,
   description,
-  userIds,
+  managers,
   flowId,
 }: ActionCreateStepTypes) => {
   const session = await getRequiredAuthSession();
@@ -65,11 +74,11 @@ export const actionCreateStep = async ({
       description,
       flowId,
       managers: {
-        create: userIds.map((userId) => ({
+        create: managers.map((manager) => ({
           status: 'MANAGER',
           user: {
             connect: {
-              id: userId.id,
+              id: manager.userId,
             },
           },
         })),
@@ -77,7 +86,6 @@ export const actionCreateStep = async ({
     },
   });
 
-  const managers = await queryManagerOnStep(createStep.id);
   const stepWithManagers = { createStep, managers };
 
   return stepWithManagers;

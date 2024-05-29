@@ -43,7 +43,8 @@ export default function FormCreateFlow() {
   const [stepDescription, setStepDescription] = useState('');
   const [isModifyingStep, setIsModifyingStep] = useState(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputAddManagerRef = useRef<HTMLInputElement>(null);
+  const firstInputStepFormRef = useRef<HTMLInputElement>(null);
   const formStepRef = useRef<HTMLFormElement>(null);
 
   const handleAddPartner = async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -66,7 +67,7 @@ export default function FormCreateFlow() {
           { partner: newPartner, id: userDatas.userId },
         ]);
         setErrorMessage(false);
-        if (inputRef.current) inputRef.current.value = '';
+        if (inputAddManagerRef.current) inputAddManagerRef.current.value = '';
       }
     }
   };
@@ -90,7 +91,7 @@ export default function FormCreateFlow() {
         setManagers((prev) => [...prev, userDatas]);
         setErrorMessage(false);
         setErrorAddManagerMessage(false);
-        if (inputRef.current) inputRef.current.value = '';
+        if (inputAddManagerRef.current) inputAddManagerRef.current.value = '';
       }
     }
   };
@@ -186,6 +187,8 @@ export default function FormCreateFlow() {
     setStepTitle('');
     setStepDescription('');
     setManagers([]);
+
+    if (firstInputStepFormRef.current) firstInputStepFormRef.current.focus();
   };
 
   const startModifyStep = (stepId: string) => {
@@ -258,6 +261,7 @@ export default function FormCreateFlow() {
             name="flowTitle"
             type="text"
             className="px-3 py-1 bg-input rounded-lg outline-ring w-full"
+            required
           />
         </label>
         <label htmlFor="flowDescription" className="flex flex-col gap-2">
@@ -267,6 +271,7 @@ export default function FormCreateFlow() {
             name="flowDescription"
             type="text"
             className="px-3 py-1 bg-input rounded-lg outline-ring"
+            required
           />
         </label>
         <div className="flex flex-col gap-2">
@@ -283,7 +288,7 @@ export default function FormCreateFlow() {
                 ))}
               </ul>
               <input
-                ref={inputRef}
+                ref={inputAddManagerRef}
                 onKeyDown={handleAddPartner}
                 id="addPartners"
                 name="addPartners"
@@ -322,12 +327,14 @@ export default function FormCreateFlow() {
           <label htmlFor="stepTitle" className="flex flex-col gap-2">
             Step title
             <input
+              ref={firstInputStepFormRef}
               value={stepTitle}
               onChange={(e) => setStepTitle(e.target.value)}
               id="stepTitle"
               name="stepTitle"
               type="text"
               className="px-3 py-1 bg-input rounded-lg outline-ring w-full"
+              required
             />
           </label>
           <label htmlFor="stepDescription" className="flex flex-col gap-2">
@@ -339,6 +346,7 @@ export default function FormCreateFlow() {
               name="stepDescription"
               type="text"
               className="px-3 py-1 bg-input rounded-lg outline-ring"
+              required
             />
           </label>
           <div className="flex flex-col gap-2">
@@ -358,7 +366,7 @@ export default function FormCreateFlow() {
                   ))}
                 </ul>
                 <input
-                  ref={inputRef}
+                  ref={inputAddManagerRef}
                   onKeyDown={handleAddManager}
                   id="stepManager"
                   name="stepManager"
@@ -386,7 +394,7 @@ export default function FormCreateFlow() {
               {isModifyingStep ? 'Save changes' : 'Add step'}
             </button>
             <Link
-              href="/link"
+              href={`/flow/new/${flowId}`}
               aria-disabled={true}
               tabIndex={true ? -1 : undefined}
               className={`flex items-center gap-1 justify-center rounded-md bg-card-foreground w-fit px-2 py-1 text-primary-foreground ${

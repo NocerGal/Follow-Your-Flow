@@ -224,11 +224,6 @@ export default function FormCreateFlow() {
       (title) => changingTitle === title.createStep.title
     );
 
-    const selectedManagerIds = managers.map((manager) => manager);
-    const filteredManagerList = steps[stepIndex].managers.filter((manager) =>
-      selectedManagerIds.includes(manager)
-    );
-
     setSteps((prevSteps) =>
       prevSteps.map((step, index) =>
         index === stepIndex
@@ -237,14 +232,15 @@ export default function FormCreateFlow() {
 
               createStep: {
                 ...step.createStep,
-                title: stepTitle,
+                title: step.createStep.title,
                 description: stepDescription,
               },
-              managers: filteredManagerList,
+              managers,
             }
           : step
       )
     );
+
     setStepTitle('');
     setStepDescription('');
     setManagers([]);
@@ -429,6 +425,7 @@ export default function FormCreateFlow() {
                       {step.managers.map((manager, index) => (
                         <li key={manager.user.id} className="mr-2">
                           {manager.user.name}
+
                           {index === step.managers.length - 1 ? '.' : ','}
                         </li>
                       ))}
